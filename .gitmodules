@@ -1,0 +1,6 @@
+[submodule "tests/git_data/content"]
+	path = tests/git_data/content
+	url = ./tests/git_data/content.git
+[submodule "tests/git_data/content_updated"]
+	path = tests/git_data/content_updated
+	url = ./tests/git_data/content_updated.git
