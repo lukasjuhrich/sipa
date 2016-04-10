@@ -1,5 +1,5 @@
 venv
-content
+/content
 documents
 *.pyc
 *.pyo
