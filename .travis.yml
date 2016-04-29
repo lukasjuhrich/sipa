@@ -1,3 +1,6 @@
+sudo: required
+services:
+  - docker
 language: python
 python:
   - "3.5"
@@ -5,8 +8,10 @@ install:
   - "pip install -r ./build/requirements/requirements.txt"
   - "pip install Flask-Testing coverage pep8 rednose"
   # nose is already installed by default.
+  - "docker-compose -f ./build/testing.yml up -d"
 cache:
   - pip
 script:
-  - "python manage.py test"
   - "pep8 ."
+  - "python manage.py test"
+  - "docker-compose -f ./build/testing.yml run --rm sipa_testing"
