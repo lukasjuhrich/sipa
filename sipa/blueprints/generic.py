@@ -130,9 +130,11 @@ def index():
 def login():
     """Login page for users
     """
+    # PHASE 0: Instantiate our form
     form = LoginForm()
 
     if form.validate_on_submit():
+        # PHASE A: initialization / sanitization of vars
         dormitory = backends.get_dormitory(form.dormitory.data)
         username = form.username.data
         password = form.password.data
@@ -144,6 +146,7 @@ def login():
         if username.endswith(valid_suffix):
             username = username[:-len(valid_suffix)]
 
+        # PHASE B: do the central thing (process the data)
         try:
             user = User.authenticate(username, password)
         except InvalidCredentials as e:
@@ -162,9 +165,11 @@ def login():
     elif form.is_submitted():
         flash_formerrors(form)
 
+    # PHASE C: if the processing was successful (indicator?), do stuff
     if current_user.is_authenticated:
         return redirect(url_for('usersuite.index'))
 
+    # PHASE D: Else, render the template.
     return render_template('login.html', form=form,
                            unsupported=backends.premature_dormitories)
 
@@ -217,6 +222,12 @@ def usertraffic():
 
     chosen_user = None
 
+    # TODO: Introduce def choose_traffic_user(current_user, ip_user)
+    # chosen_user = choose_traffic_user(current_user, ip_user)
+
+    # TODO: Q: How to separate logic from blueprints? Most of the
+    # modular functions still contain things like `flash` or terminate
+    # with a `redirect`, which makes them not so modular. Is that bad?
     if current_user.is_authenticated:
         chosen_user = current_user
         if not current_user.has_connection and not ip_user.is_authenticated:
@@ -269,9 +280,13 @@ def traffic_api():
 
 @bp_generic.route('/contact', methods=['GET', 'POST'])
 def contact():
+    # TODO: Separate into phases just as before
+    # PHASE 0: Form instance
     form = AnonymousContactForm()
 
     if form.validate_on_submit():
+        # Phase A: initialization / validation [skipped]
+        # PHASE B: do the central thing (process the data)
         success = send_contact_mail(
             sender=form.email.data,
             subject=form.email.data,
@@ -280,6 +295,7 @@ def contact():
             dormitory_name=form.dormitory.data,
         )
 
+        # PHASE C: if the processing was successful (indicator?), do stuff
         if success:
             flash(gettext("Nachricht wurde versandt."), "success")
         else:
@@ -294,6 +310,7 @@ def contact():
                       "Administratoren eines anderen Wohnheims "
                       "kontaktieren willst."), 'info')
 
+    # PHASE D: Else, render the template.
     return render_template('anonymous_contact.html', form=form)
 
 
