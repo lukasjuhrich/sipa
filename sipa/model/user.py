@@ -5,6 +5,7 @@ from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 
 from sipa.model.fancy_property import active_prop, UnsupportedProperty
+from sipa.model.misc import compare_all_attributes
 
 
 # noinspection PyMethodMayBeStatic
@@ -45,7 +46,7 @@ class BaseUser(AuthenticatedUserMixin, metaclass=ABCMeta):
         self.uid = uid
 
     def __eq__(self, other):
-        return self.uid == other.uid and self.datasource == other.datasource
+        return compare_all_attributes(self, other, ['uid', 'datasource'])
 
     datasource = None
 

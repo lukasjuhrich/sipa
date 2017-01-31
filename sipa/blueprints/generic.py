@@ -206,6 +206,34 @@ def jinja_format_date(date):
 bp_generic.add_app_template_filter(format_money, name='money')
 
 
+class TrafficUserSelector:
+    """A helper class selecting the user whose traffic to display"""
+
+    def __init__(self, by_login, by_connection):
+        self.by_login = by_login
+        self.by_connection = by_connection
+
+    @property
+    def user_selection(self):
+        if self.by_connection.is_authenticated:
+            return self.by_connection
+        if self.by_login.is_authenticated:
+            return self.by_login
+        return None
+
+    @property
+    def prohibited_by_state(self):
+        return all([self.by_login.is_authenticated,
+                    not self.by_connection.is_authenticated,
+                    not self.by_login.has_connection])
+
+    @property
+    def different_persons_accessing(self):
+        return all([self.by_connection.is_authenticated,
+                    self.by_login.is_authenticated,
+                    self.by_connection != self.by_login])
+
+
 @bp_generic.route("/usertraffic")
 def usertraffic():
     """Show a user's traffic on a static site just as in the usersuite.
@@ -214,34 +242,29 @@ def usertraffic():
     is flashed and the traffic of the `ip_user` is displayed.
     """
     ip_user = backends.user_from_ip(request.remote_addr)
+    selector = TrafficUserSelector(by_login=current_user, by_connection=ip_user)
 
-    chosen_user = None
+    if selector.prohibited_by_state:
+        flash(gettext("Aufgrund deines Nutzerstatus kannst Du "
+                      "keine Trafficdaten einsehen."), "info")
+        return redirect(url_for('generic.index'))
 
-    if current_user.is_authenticated:
-        chosen_user = current_user
-        if not current_user.has_connection and not ip_user.is_authenticated:
-            flash(gettext("Aufgrund deines Nutzerstatus kannst Du "
-                          "keine Trafficdaten einsehen."), "info")
-            return redirect(url_for('generic.index'))
+    chosen_user = selector.user_selection
 
-    if ip_user.is_authenticated:
-        chosen_user = ip_user
+    if not chosen_user:
+        abort(401)
 
-        if current_user.is_authenticated:
-            if current_user != ip_user:
-                flash(gettext("Ein anderer Nutzer als der für diesen "
-                              "Anschluss Eingetragene ist angemeldet!"),
-                      'warning')
-                flash(gettext("Hier werden die Trafficdaten "
-                              "dieses Anschlusses angezeigt."), "info")
+    if selector.different_persons_accessing:
+        flash(gettext("Ein anderer Nutzer als der für diesen "
+                      "Anschluss Eingetragene ist angemeldet!"),
+              'warning')
+        flash(gettext("Hier werden die Trafficdaten "
+                      "dieses Anschlusses angezeigt."), "info")
 
-    if chosen_user:
-        user_id = chosen_user.id.value if chosen_user.id.supported else None
-        return render_template("usertraffic.html",
-                               user_id=user_id,
-                               traffic_user=chosen_user)
-
-    abort(401)
+    user_id = chosen_user.id.value if chosen_user.id.supported else None
+    return render_template("usertraffic.html",
+                           user_id=user_id,
+                           traffic_user=chosen_user)
 
 
 @bp_generic.route('/usertraffic/json')
