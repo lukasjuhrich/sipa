@@ -65,6 +65,7 @@ We like where you're looking. Wanna see more? Contact us at du-bist-gefragt<at>a
 
     <body>
         <nav id="main-navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div id="top-color-border" />
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
@@ -197,12 +198,26 @@ We like where you're looking. Wanna see more? Contact us at du-bist-gefragt<at>a
         </nav>
 
         <header class="pg-header">
+            <img src="{{ url_for('static', filename='img/background.jpg') }}" />
             <div class="container">
                 <h1>AG DSN</h1>
                 <p>Arbeitsgemeinschaft Dresdner Studentennetz</p>
             </div>
+
         </header>
 
+        <div class="container container-overlap">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="big-overlap">
+                        <h2>Hello there!</h2>
+                        <img src="{{ url_for('static', filename='img/community_8nwl.svg') }}" />
+                        <div>The student network is brought to you by volunteers. Wanna join?</div>
+                    </div>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
+        </div>
 
         <div id="center" class="container">
             <div class="row">

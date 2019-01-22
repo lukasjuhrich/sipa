@@ -16,33 +16,35 @@
 
 {% block content %}
     {% if articles %}{% for art in articles %}
-        <h2>{{ art.title }}</h2>
-        {% if art.outage or art.information or art.event %}
-            <p>
-            {%- for out in art.outage %}
-                <span class="label label-danger">{{ out }}</span>
-            {%- endfor %}
-            {%- for info in art.information %}
-                <span class="label label-warning">{{ info }}</span>
-            {%- endfor %}
-            {%- for ev in art.event %}
-                <span class="label label-success">{{ ev }}</span>
-            {%- endfor %}
-            </p>
-        {% endif %}
-        {% if art.author -%}
-            <small>{{ _("Geschrieben von") }} {{ art.author }}, {{ art.date }}.</small>
-        {%- elif art.date -%}
-            <small>{{ _("Vom")}} {{ art.date }}.</small>
-        {%- endif %}
-        <a href="{{ url_for('news.show_news', filename=art.file_basename) }}">
-            <small>
-                Permalink <span class="glyphicon glyphicon-link"></span>
-            </small>
-        </a>
-        <hr />
-        <div class="newsblock">{{ art.html|safe }}</div>
+        <div class="agdsn-news-article">
+            <h2>{{ art.title }}</h2>
+            {% if art.outage or art.information or art.event %}
+                <p>
+                {%- for out in art.outage %}
+                    <span class="label label-danger">{{ out }}</span>
+                {%- endfor %}
+                {%- for info in art.information %}
+                    <span class="label label-warning">{{ info }}</span>
+                {%- endfor %}
+                {%- for ev in art.event %}
+                    <span class="label label-success">{{ ev }}</span>
+                {%- endfor %}
+                </p>
+            {% endif %}
+            {% if art.author -%}
+                <small>{{ _("Geschrieben von") }} {{ art.author }}, {{ art.date }}.</small>
+            {%- elif art.date -%}
+                <small>{{ _("Vom")}} {{ art.date }}.</small>
+            {%- endif %}
+            <a href="{{ url_for('news.show_news', filename=art.file_basename) }}">
+                <small>
+                    Permalink <span class="glyphicon glyphicon-link"></span>
+                </small>
+            </a>
+            {# <hr /> #}
+            <div class="newsblock">{{ art.html|safe }}</div>
 
+        </div>
     {%- endfor %}{%- else -%}
         <div class="alert alert-info">
             {{ _("Keine News Vorhanden!") }}
